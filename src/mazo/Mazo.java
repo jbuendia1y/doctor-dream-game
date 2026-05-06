@@ -8,11 +8,55 @@ import cartas.Carta;
 import java.util.*;
 
 public class Mazo {
-
+    
     private List<Carta> pilaRobo;
     private Stack<Carta> pilaDescarte;
     private Queue<Carta> mano;
 
+
+    /**
+     * @return the pilaRobo
+     */
+    public List<Carta> getPilaRobo() {
+        return pilaRobo;
+    }
+
+    /**
+     * @param pilaRobo the pilaRobo to set
+     */
+    public void setPilaRobo(List<Carta> pilaRobo) {
+        this.pilaRobo = pilaRobo;
+    }
+
+    /**
+     * @return the pilaDescarte
+     */
+    public Stack<Carta> getPilaDescarte() {
+        return pilaDescarte;
+    }
+
+    /**
+     * @param pilaDescarte the pilaDescarte to set
+     */
+    public void setPilaDescarte(Stack<Carta> pilaDescarte) {
+        this.pilaDescarte = pilaDescarte;
+    }
+
+    /**
+     * @return the mano
+     */
+    public Queue<Carta> getMano() {
+        return mano;
+    }
+
+    /**
+     * @param mano the mano to set
+     */
+    public void setMano(Queue<Carta> mano) {
+        this.mano = mano;
+    }
+
+    
     public Mazo() {
         pilaRobo = new ArrayList<>();
         pilaDescarte = new Stack<>();
@@ -20,20 +64,20 @@ public class Mazo {
     }
 
     public void barajar() {
-        Collections.shuffle(pilaRobo);
+        Collections.shuffle(getPilaRobo());
     }
 
     public Carta robar() {
-        if (pilaRobo.isEmpty()) {
+        if (getPilaRobo().isEmpty()) {
             while (!pilaDescarte.isEmpty()) {
-                pilaRobo.add(pilaDescarte.pop());
+                getPilaRobo().add(getPilaDescarte().pop());
             }
             barajar();
         }
 
         if (!pilaRobo.isEmpty()) {
-            Carta carta = pilaRobo.remove(0);
-            mano.add(carta);
+            Carta carta = getPilaRobo().remove(0);
+            getMano().add(carta);
             return carta;
         }
 
@@ -41,9 +85,9 @@ public class Mazo {
     }
 
     public void descartar(Carta carta) {
-        if (mano.contains(carta)) {
-            mano.remove(carta);
-            pilaDescarte.push(carta);
+        if (getMano().contains(carta)) {
+            getMano().remove(carta);
+            getPilaDescarte().push(carta);
         }
     }
 }
