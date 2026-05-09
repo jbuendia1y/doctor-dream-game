@@ -28,15 +28,15 @@ public class GestorCombate {
         }
     }
 
-    // 👉 La UI o el controlador llama a esto después del turno del jugador
-    public void ejecutarTurnoEnemigo() {
-        if (turnoJugador || terminado) return;
+    public int ejecutarTurnoEnemigo() {
+        if (turnoJugador || terminado) return 0;
 
-        int danio = 5;
+        int danio = 5 + (int) (Math.random() * 6);
         jugador.recibirDanio(danio);
 
         verificarFin();
         turnoJugador = true;
+        return danio;
     }
 
     private void verificarFin() {

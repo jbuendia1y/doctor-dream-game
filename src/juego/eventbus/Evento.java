@@ -1,0 +1,13 @@
+package juego.eventbus;
+
+public enum Evento {
+    INICIAR_COMBATE,
+    CARTA_USADA,
+    TURNO_JUGADOR,
+    TURNO_ENEMIGO,
+    ENEMIGO_ATACO,
+    VIDA_ACTUALIZADA,
+    COMBATE_TERMINADO,
+    MOSTRAR_MENU,
+    MOSTRAR_COMBATE
+}

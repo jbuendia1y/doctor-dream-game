@@ -1,20 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package doctordream;
 
-/**
- *
- * @author jgame
- */
+import javax.swing.SwingUtilities;
+import juego.controlador.ControladorMenu;
+import juego.vista.VentanaPrincipal;
+
 public class DoctorDream {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
-        // TODO code application logic here
+        SwingUtilities.invokeLater(() -> {
+            ControladorMenu controladorMenu = new ControladorMenu();
+            VentanaPrincipal ventana = new VentanaPrincipal(controladorMenu);
+            ventana.setVisible(true);
+        });
     }
-    
 }

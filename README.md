@@ -1,6 +1,6 @@
 # 🧬 Doctor Dream: Guardianes del Cuerpo
 
-Juego educativo 2D estilo pixel art desarrollado en Java, basado en combate por turnos con cartas. El jugador asume el rol de un doctor que combate enfermedades dentro del cuerpo humano utilizando conocimientos médicos representados como habilidades.
+Juego educativo 2D estilo pixel art desarrollado en Java con Swing, basado en combate por turnos con cartas. El jugador asume el rol de un doctor que combate enfermedades dentro del cuerpo humano utilizando conocimientos médicos representados como habilidades.
 
 ---
 
@@ -10,25 +10,40 @@ Aplicar conceptos de:
 
 * Programación Orientada a Objetos (POO)
 * Principios SOLID
-* Estructuras de Datos (List, Stack)
-* Arquitectura modular
-
-Todo dentro de un entorno interactivo tipo videojuego.
+* Estructuras de Datos (List, Stack, Queue)
+* Arquitectura modular con separación de responsabilidades
+* Patrón EventBus para desacoplar lógica de renderizado
+* MVC (Modelo-Vista-Controlador) con Swing
 
 ---
 
 ## 🧩 Arquitectura del Sistema
 
-El proyecto está dividido en módulos independientes para facilitar el desarrollo en equipo y reducir el acoplamiento.
+El proyecto sigue una arquitectura en capas con EventBus como middleware de comunicación:
 
 ```
 src/
- ├── juego/        → Renderizado, game loop, mapa
- ├── combate/      → Lógica de combate por turnos
- ├── cartas/       → Tipos de cartas (ataque, defensa, efecto)
- ├── mazo/         → Gestión del mazo y estructuras de datos
- ├── entidades/    → Jugador, enemigo y abstracciones
+ ├── juego/
+ │   ├── eventbus/      → EventBus (pub/sub) + Eventos del sistema
+ │   ├── controlador/   → Controladores (orquestan lógica de negocio)
+ │   └── vista/         → Vistas Swing (JFrame, JPanels) — solo renderizan
+ ├── combate/           → Lógica de combate por turnos
+ ├── cartas/            → Tipos de cartas (ataque, defensa, efecto)
+ ├── mazo/              → Gestión del mazo y estructuras de datos
+ ├── entidades/         → Jugador, enemigo y abstracciones
+ └── doctordream/       → Punto de entrada (main)
 ```
+
+### Flujo de comunicación
+
+```
+Vista (Swing) ──llama──▶ Controlador ──modifica──▶ Modelo
+                              │
+                              ▼
+                          EventBus ──notifica──▶ Vista (se actualiza sola)
+```
+
+Las vistas **nunca** modifican el modelo directamente. Los controladores orquestan la lógica y publican eventos. Las vistas se suscriben a eventos y se actualizan automáticamente.
 
 ---
 
@@ -38,12 +53,11 @@ src/
 
 Cada módulo tiene una responsabilidad clara:
 
-* `GestorCombate` → combate
+* `GestorCombate` → lógica de combate
 * `Mazo` → gestión de cartas
-* `Juego` → flujo general
-* `Entidad` → estado de personajes
-
----
+* `ControladorCombate` → orquestación del flujo de combate
+* `PanelCombate` → solo renderizado de la UI de combate
+* `EventBus` → comunicación desacoplada entre capas
 
 ### ✅ OCP (Abierto/Cerrado)
 
@@ -53,13 +67,9 @@ El sistema permite agregar nuevas cartas sin modificar código existente:
 class CartaVeneno extends Carta { ... }
 ```
 
----
-
 ### ✅ LSP (Sustitución de Liskov)
 
 Se utiliza la abstracción `Combatiente`, permitiendo tratar jugadores y enemigos de forma uniforme.
-
----
 
 ### ✅ DIP (Inversión de Dependencias)
 
@@ -70,6 +80,8 @@ private Combatiente jugador;
 private Combatiente enemigo;
 ```
 
+Las vistas dependen de controladores abstractos, no de implementaciones concretas del modelo.
+
 ---
 
 ## ⚔️ Sistema de Combate
@@ -77,10 +89,11 @@ private Combatiente enemigo;
 El combate es por turnos:
 
 1. El jugador roba cartas
-2. Usa una carta
-3. Se aplica el efecto (daño, defensa, buff)
-4. El enemigo responde
-5. Se repite hasta que uno pierda
+2. Selecciona una carta de la mano (botón en UI)
+3. El controlador aplica el efecto (daño, defensa, buff)
+4. Publica eventos de actualización
+5. El enemigo responde automáticamente
+6. Se repite hasta que uno pierda
 
 ---
 
@@ -104,9 +117,9 @@ Tipos de cartas:
 
 El mazo se divide en tres estados:
 
-* **pilaRobo** → cartas disponibles
-* **mano** → cartas utilizables
-* **pilaDescarte** → cartas usadas
+* **pilaRobo** → cartas disponibles (List)
+* **mano** → cartas utilizables (Queue)
+* **pilaDescarte** → cartas usadas (Stack)
 
 Esto permite simular correctamente el flujo de un juego de cartas.
 
@@ -129,45 +142,79 @@ Responsabilidades:
 
 ---
 
+## 🎭 Patrón EventBus
+
+El `EventBus` es un singleton que permite comunicación desacoplada:
+
+```java
+// Publicar evento
+EventBus.getInstancia().publicar(Evento.VIDA_ACTUALIZADA, datos);
+
+// Suscribirse desde la vista
+EventBus.getInstancia().suscribir(Evento.VIDA_ACTUALIZADA, datos -> {
+    lblVida.setText("❤️ " + jugador.obtenerVida());
+});
+```
+
+Eventos del sistema:
+
+| Evento              | Disparado por              | Escuchado por     |
+|---------------------|----------------------------|-------------------|
+| INICIAR_COMBATE     | ControladorMenu            | PanelCombate      |
+| CARTA_USADA         | ControladorCombate         | PanelCombate      |
+| TURNO_JUGADOR       | ControladorCombate         | PanelCombate      |
+| TURNO_ENEMIGO       | ControladorCombate         | PanelCombate      |
+| VIDA_ACTUALIZADA    | ControladorCombate         | PanelCombate      |
+| COMBATE_TERMINADO   | ControladorCombate         | PanelCombate      |
+| MOSTRAR_MENU        | PanelCombate/Controlador   | VentanaPrincipal  |
+| MOSTRAR_COMBATE     | ControladorMenu            | VentanaPrincipal  |
+
+---
+
 ## 🎮 Renderizado y Juego
 
 Incluye:
 
-* Game loop
-* Render con `JPanel`
-* Animaciones por frames
-* Sistema de tiles para el mapa
-* Interfaz de cartas
+* JFrame con CardLayout para navegar entre pantallas
+* Panel de menú principal
+* Panel de combate con HUD (vida, escudo, bonos)
+* Botones de cartas interactivos
+* Bitácora de combate
+* Diálogos de victoria/derrota
 
 ---
 
 ## 👥 División del Trabajo
 
-| Integrante | Módulo           |
-| ---------- | ---------------- |
-| Joaquín    | Combate + Cartas |
-| Paolo      | Mazo             |
-| Aldhair    | Render + Juego   |
-| Dens       | Entidades        |
+| Integrante | Módulo                        |
+|------------|-------------------------------|
+| Joaquín    | Combate + Cartas              |
+| Paolo      | Mazo                          |
+| Aldhair    | Vistas + EventBus             |
+| Dens       | Entidades + Controladores     |
 
 ---
 
 ## 🚀 Estado del Proyecto
 
-En desarrollo. Se implementarán progresivamente:
+✅ En desarrollo funcional:
 
-* Combate funcional
-* Render básico
-* Sistema completo de cartas
+* ✅ Combate por turnos funcional
+* ✅ Render con JFrame + JPanels
+* ✅ Sistema de cartas (ataque, defensa, efecto)
+* ✅ EventBus operativo
+* ✅ Separación Vista-Controlador-Modelo
 
 ---
 
-## 🧪 Ejecución (futuro)
+## 🧪 Ejecución
 
 ```bash
-javac Main.java
-java Main
+javac -d build src/**/*.java
+java -cp build doctordream.DoctorDream
 ```
+
+O desde NetBeans: abrir proyecto → Run (F6).
 
 ---
 
@@ -179,6 +226,7 @@ Este proyecto está diseñado para ser:
 * Modular
 * Fácil de mantener
 * Didáctico para niños
+* Extensible con nuevas cartas, enemigos y efectos
 
 ---
 
