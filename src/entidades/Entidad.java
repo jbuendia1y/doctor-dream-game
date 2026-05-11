@@ -13,9 +13,19 @@ public abstract class Entidad implements Combatiente{
     
     @Override
     public void recibirDanio(int danio){
-        vida -= danio;
-        if(vida<0){
-            vida=0;
+        // El escudo absorbe primero (solo Jugador tiene escudo, pero la lógica es polimórfica)
+        int danioReal = danio;
+        if (this instanceof entidades.Jugador j) {
+            int escudoActual = j.obtenerEscudo();
+            if (escudoActual > 0) {
+                int absorcion = Math.min(escudoActual, danioReal);
+                j.reducirEscudo(absorcion);
+                danioReal -= absorcion;
+            }
+        }
+        vida -= danioReal;
+        if(vida < 0){
+            vida = 0;
         }
     }
     

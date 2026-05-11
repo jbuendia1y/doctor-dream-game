@@ -2,62 +2,63 @@ package combate;
 
 import cartas.Carta;
 import entidades.Combatiente;
+import entidades.Enemigo;
 import entidades.Jugador;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * GestorCombate — solo administra ESTADO del combate.
+ * NO publica eventos, NO avanza turnos internamente.
+ * El ControladorCombate es el único que orquesta el flujo.
+ */
 public class GestorCombate {
 
-    private Combatiente jugador;
-    private Combatiente enemigo;
-    private boolean turnoJugador = true;
+    private final Jugador      jugador;
+    private final List<Enemigo> enemigos;
     private boolean terminado = false;
 
-    public GestorCombate(Combatiente jugador, Combatiente enemigo) {
-        this.jugador = jugador;
-        this.enemigo = enemigo;
+    public GestorCombate(Jugador jugador, List<Enemigo> enemigos) {
+        this.jugador  = jugador;
+        this.enemigos = new ArrayList<>(enemigos);
     }
 
-    // El controlador debe llamar este método para usar la carta
-    public void jugarCarta(Jugador jugadorReal, Carta carta) {
-        if (!turnoJugador || terminado) return;
-
-        carta.usar(jugadorReal, enemigo);
+    /** Aplica el efecto de la carta sobre el primer enemigo vivo. Devuelve true si mató al enemigo. */
+    public boolean aplicarCarta(Carta carta) {
+        Enemigo objetivo = primerEnemigoVivo();
+        if (objetivo == null) { verificarFin(); return false; }
+        carta.usar(jugador, objetivo);
         verificarFin();
-
-        if (!terminado) {
-            turnoJugador = false;
-        }
+        return !objetivo.estaVivo();
     }
 
-    public int ejecutarTurnoEnemigo() {
-        if (turnoJugador || terminado) return 0;
-
-        int danio = 5 + (int) (Math.random() * 6);
-        jugador.recibirDanio(danio);
-
+    /** Un enemigo concreto ataca al jugador. Devuelve el daño real recibido (después del escudo). */
+    public int aplicarAtaqueEnemigo(Enemigo e) {
+        int vidaAntes = jugador.obtenerVida();
+        jugador.recibirDanio(e.calcularDanio());
+        int danioReal = vidaAntes - jugador.obtenerVida(); // lo que realmente bajó
         verificarFin();
-        turnoJugador = true;
-        return danio;
+        return danioReal;
     }
 
     private void verificarFin() {
-        if (!jugador.estaVivo() || !enemigo.estaVivo()) {
-            terminado = true;
-        }
+        if (!jugador.estaVivo() || todosEnemigosDerotados()) terminado = true;
     }
 
-    public boolean esTurnoJugador() {
-        return turnoJugador;
+    private boolean todosEnemigosDerotados() {
+        return enemigos.stream().noneMatch(Combatiente::estaVivo);
     }
 
-    public boolean estaTerminado() {
-        return terminado;
+    public Enemigo primerEnemigoVivo() {
+        return enemigos.stream().filter(Combatiente::estaVivo).findFirst().orElse(null);
     }
 
-    public Combatiente getJugador() {
-        return jugador;
+    public List<Enemigo> getEnemigosVivos() {
+        return enemigos.stream().filter(Combatiente::estaVivo).toList();
     }
 
-    public Combatiente getEnemigo() {
-        return enemigo;
-    }
+    public List<Enemigo> getTodosEnemigos() { return enemigos; }
+    public boolean estaTerminado()          { return terminado; }
+    public boolean ganoJugador()            { return terminado && jugador.estaVivo(); }
+    public Jugador getJugador()             { return jugador; }
 }

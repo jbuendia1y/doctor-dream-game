@@ -8,6 +8,9 @@ public enum Evento {
     ENEMIGO_ATACO,
     VIDA_ACTUALIZADA,
     COMBATE_TERMINADO,
+    ENEMIGO_DERROTADO,
+    NUEVO_ENEMIGO,
+    BLOQUEAR_CARTAS,    // deshabilita botones mientras corre el turno
     MOSTRAR_MENU,
     MOSTRAR_COMBATE
 }

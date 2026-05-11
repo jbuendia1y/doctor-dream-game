@@ -26,6 +26,10 @@ public class Jugador extends Entidad{
         this.escudo += escudo;
     }
 
+    public void reducirEscudo(int cantidad) {
+        this.escudo = Math.max(0, this.escudo - cantidad);
+    }
+
     public int obtenerEscudo(){
         return escudo;
     }
