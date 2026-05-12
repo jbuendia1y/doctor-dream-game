@@ -11,19 +11,19 @@ public class Animacion {
 
     public Animacion(BufferedImage[] frames) {
         this.frames = frames;
-        this.frameActual = 0;
+        this.frameActual = -1;
         this.activa = false;
         this.looping = true;
     }
 
     public void reproducirUnaVez() {
-        frameActual = 0;
+        frameActual = -1;
         activa = true;
         looping = false;
     }
 
     public void reproducirEnBucle() {
-        frameActual = 0;
+        frameActual = -1;
         activa = true;
         looping = true;
     }
@@ -54,6 +54,9 @@ public class Animacion {
         if (frames == null || frames.length == 0) {
             return null;
         }
+        if (frameActual < 0) {
+            frameActual = 0;
+        }
         if (frameActual >= frames.length) {
             frameActual = frames.length - 1;
         }
@@ -62,7 +65,7 @@ public class Animacion {
 
     public void setFrames(BufferedImage[] frames) {
         this.frames = frames;
-        this.frameActual = 0;
+        this.frameActual = -1;
     }
 
     public boolean isActiva() {

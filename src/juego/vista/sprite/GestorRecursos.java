@@ -39,7 +39,8 @@ public class GestorRecursos {
         animaciones.put("moco_mutado", cargarFrames("ENEMIGOS/", "MocoMutadoAnimado0", 5, ".png"));
         animaciones.put("boss", cargarFrames("ENEMIGOS/", "boss10", 9, ".png"));
 
-        imagenes.put("mapa1", cargarImagen("MAPAS/mapa1.png"));
+        imagenes.put("mapa1", cargarImagen("MAPAS/mapa1.jpg"));
+        imagenes.put("menu_fondo", cargarImagen("MENUS/MENU_PRINCIPAL_FONDO.jpg"));
     }
 
     private BufferedImage[] cargarFrames(String dir, String prefix, int count, String suffix) {

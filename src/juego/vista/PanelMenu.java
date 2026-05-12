@@ -19,16 +19,9 @@ public class PanelMenu extends JPanel {
     private final BufferedImage fondo;
 
     public PanelMenu(ControladorMenu controlador) {
-        this.fondo = GestorRecursos.getInstancia().getImagen("mapa1");
+        this.fondo = GestorRecursos.getInstancia().getImagen("menu_fondo");
 
         setLayout(new BorderLayout());
-
-        JLabel titulo = new JLabel("<html><center>🧬 Doctor Dream:<br>Guardianes del Cuerpo</center></html>",
-                SwingConstants.CENTER);
-        titulo.setFont(new Font("Monospaced", Font.BOLD, 26));
-        titulo.setForeground(new Color(100, 200, 255));
-        titulo.setOpaque(false);
-        add(titulo, BorderLayout.CENTER);
 
         JPanel panelBotones = new JPanel();
         panelBotones.setOpaque(false);

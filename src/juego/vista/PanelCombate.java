@@ -157,6 +157,7 @@ public class PanelCombate extends JPanel {
 
         Consumer<Object> cbCartaUsada = datos -> SwingUtilities.invokeLater(() -> {
             Carta c = (Carta) datos;
+            habilitarCartas(false);
             if (c instanceof CartaAtaque) {
                 panelSprites.setAnimacionJugador("doctor_ataque", false);
             } else if (c instanceof CartaDefensa) {

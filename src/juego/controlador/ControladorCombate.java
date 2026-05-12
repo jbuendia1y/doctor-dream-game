@@ -1,5 +1,6 @@
 package juego.controlador;
 
+import javax.swing.Timer;
 import cartas.Carta;
 import cartas.CartaAtaque;
 import cartas.CartaDefensa;
@@ -57,20 +58,34 @@ public class ControladorCombate {
             return;
         }
 
-        EventBus.getInstancia().publicar(Evento.TURNO_ENEMIGO);
+        // Esperar a que termine la animación de la carta
+        Timer timerCarta = new Timer(900, e1 -> {
+            ((Timer) e1.getSource()).stop();
 
-        int danioRecibido = gestor.ejecutarTurnoEnemigo();
+            EventBus.getInstancia().publicar(Evento.TURNO_ENEMIGO);
 
-        EventBus.getInstancia().publicar(Evento.ENEMIGO_ATACO, danioRecibido);
-        EventBus.getInstancia().publicar(Evento.VIDA_ACTUALIZADA, this);
+            int danioRecibido = gestor.ejecutarTurnoEnemigo();
 
-        if (gestor.estaTerminado()) {
-            EventBus.getInstancia().publicar(Evento.COMBATE_TERMINADO, false);
-            return;
-        }
+            EventBus.getInstancia().publicar(Evento.ENEMIGO_ATACO, danioRecibido);
+            EventBus.getInstancia().publicar(Evento.VIDA_ACTUALIZADA, this);
 
-        jugador.getMazo().robar();
-        EventBus.getInstancia().publicar(Evento.TURNO_JUGADOR, this);
+            if (gestor.estaTerminado()) {
+                EventBus.getInstancia().publicar(Evento.COMBATE_TERMINADO, false);
+                return;
+            }
+
+            // Esperar a que termine la animación de daño
+            Timer timerDanio = new Timer(500, e2 -> {
+                ((Timer) e2.getSource()).stop();
+
+                jugador.getMazo().robar();
+                EventBus.getInstancia().publicar(Evento.TURNO_JUGADOR, this);
+            });
+            timerDanio.setRepeats(false);
+            timerDanio.start();
+        });
+        timerCarta.setRepeats(false);
+        timerCarta.start();
     }
 
     public GestorCombate getGestor() {
