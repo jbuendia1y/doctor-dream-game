@@ -2,25 +2,26 @@ package combate;
 
 import cartas.Carta;
 import entidades.Combatiente;
+import entidades.Enemigo;
 import entidades.Jugador;
+import java.util.List;
 
 public class GestorCombate {
 
     private Combatiente jugador;
-    private Combatiente enemigo;
+    private List<Enemigo> enemigos;
     private boolean turnoJugador = true;
     private boolean terminado = false;
 
-    public GestorCombate(Combatiente jugador, Combatiente enemigo) {
+    public GestorCombate(Combatiente jugador, List<Enemigo> enemigos) {
         this.jugador = jugador;
-        this.enemigo = enemigo;
+        this.enemigos = enemigos;
     }
 
-    // El controlador debe llamar este método para usar la carta
-    public void jugarCarta(Jugador jugadorReal, Carta carta) {
+    public void jugarCarta(Jugador jugadorReal, Carta carta, Combatiente objetivo) {
         if (!turnoJugador || terminado) return;
 
-        carta.usar(jugadorReal, enemigo);
+        carta.usar(jugadorReal, objetivo);
         verificarFin();
 
         if (!terminado) {
@@ -28,21 +29,31 @@ public class GestorCombate {
         }
     }
 
-    public int ejecutarTurnoEnemigo() {
-        if (turnoJugador || terminado) return 0;
+    public int ejecutarAtaqueEnemigo(Enemigo enemigo) {
+        if (terminado) return 0;
 
         int danio = 5 + (int) (Math.random() * 6);
         jugador.recibirDanio(danio);
 
         verificarFin();
-        turnoJugador = true;
         return danio;
     }
 
+    public void pasarTurnoJugador() {
+        turnoJugador = true;
+    }
+
     private void verificarFin() {
-        if (!jugador.estaVivo() || !enemigo.estaVivo()) {
+        if (!jugador.estaVivo()) {
             terminado = true;
+            return;
         }
+        for (Enemigo e : enemigos) {
+            if (e.estaVivo()) {
+                return;
+            }
+        }
+        terminado = true;
     }
 
     public boolean esTurnoJugador() {
@@ -57,7 +68,7 @@ public class GestorCombate {
         return jugador;
     }
 
-    public Combatiente getEnemigo() {
-        return enemigo;
+    public List<Enemigo> getEnemigos() {
+        return enemigos;
     }
 }

@@ -14,6 +14,10 @@ public class Jugador extends Entidad{
         this.bonoDanio=0;
     }
 
+    public void curarse(int vida){
+        this.vida = this.obtenerVida() + vida;
+    }
+
     public void agregarMana(int mana){
         this.mana = mana;
     }

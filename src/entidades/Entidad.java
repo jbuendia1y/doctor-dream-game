@@ -28,6 +28,10 @@ public abstract class Entidad implements Combatiente{
     public int obtenerVida(){
         return vida;
     }
+
+    public int getVidaMaxima(){
+        return vidaMaxima;
+    }
     
     public String getNombre(){
         return nombre;
