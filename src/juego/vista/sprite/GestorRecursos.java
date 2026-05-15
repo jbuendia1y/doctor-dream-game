@@ -40,7 +40,17 @@ public class GestorRecursos {
         animaciones.put("boss", cargarFrames("ENEMIGOS/", "boss10", 9, ".png"));
 
         imagenes.put("mapa1", cargarImagen("MAPAS/mapa1.jpg"));
-        imagenes.put("menu_fondo", cargarImagen("MENUS/MENU_PRINCIPAL_FONDO.jpg"));
+        imagenes.put("menu_fondo", cargarImagen("MENUS/MENU_PRINCIPAL_FONDO.jpeg"));
+        imagenes.put("consultorio_fondo", cargarImagen("CONSULTORIO/fondo.jpeg"));
+        imagenes.put("casa_fondo", cargarImagen("CASA/fondo.jpg"));
+
+        imagenes.put("dialogo_recuadro_avatar", cargarImagen("DIALOGOS/DIALOGO_RECUADRO_AVATAR.png"));
+        imagenes.put("dialogo_recuadro_texto", cargarImagen("DIALOGOS/DIALOGO_RECUADRO_TEXTO.png"));
+        imagenes.put("dialogo_avatar_generico", cargarImagen("DIALOGOS/DIALOGO_AVATAR_GENERICO.png"));
+        imagenes.put("dialogo_avatar_doctor", cargarImagen("DIALOGOS/DIALOGO_AVATAR_DOCTOR.png"));
+        imagenes.put("dialogo_avatar_npc1", cargarImagen("DIALOGOS/DIALOGO_AVATAR_NPC1.png"));
+
+        animaciones.put("npc1_sprite", new BufferedImage[]{cargarImagen("NPCS/NPC1.png")});
     }
 
     private BufferedImage[] cargarFrames(String dir, String prefix, int count, String suffix) {

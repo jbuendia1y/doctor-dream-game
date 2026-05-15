@@ -8,6 +8,7 @@ import juego.controlador.ControladorCombate;
 import juego.controlador.ControladorMenu;
 import juego.eventbus.EventBus;
 import juego.eventbus.Evento;
+import juego.modelo.Nivel;
 
 public class VentanaPrincipal extends JFrame {
 
@@ -18,7 +19,7 @@ public class VentanaPrincipal extends JFrame {
     public VentanaPrincipal(ControladorMenu controladorMenu) {
         setTitle("Doctor Dream - Guardianes del Cuerpo");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 650);
+        setSize(1280, 720);
         setLocationRelativeTo(null);
         setResizable(false);
 
@@ -48,6 +49,30 @@ public class VentanaPrincipal extends JFrame {
             panelCombate.setName("combate");
             panelPrincipal.add(panelCombate, "combate");
             cardLayout.show(panelPrincipal, "combate");
+        });
+
+        bus.suscribir(Evento.MOSTRAR_CONSULTORIO, datos -> {
+            JPanel antiguo = findPanel("consultorio");
+            if (antiguo != null) {
+                panelPrincipal.remove(antiguo);
+            }
+            Nivel nivel = (Nivel) datos;
+            PanelConsultorio consultorio = new PanelConsultorio(nivel);
+            consultorio.setName("consultorio");
+            panelPrincipal.add(consultorio, "consultorio");
+            cardLayout.show(panelPrincipal, "consultorio");
+        });
+
+        bus.suscribir(Evento.MOSTRAR_CASA, datos -> {
+            JPanel antiguo = findPanel("casa");
+            if (antiguo != null) {
+                panelPrincipal.remove(antiguo);
+            }
+            Nivel nivel = (Nivel) datos;
+            PanelCasa casa = new PanelCasa(nivel);
+            casa.setName("casa");
+            panelPrincipal.add(casa, "casa");
+            cardLayout.show(panelPrincipal, "casa");
         });
     }
 

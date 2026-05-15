@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import juego.controlador.ControladorMenu;
+import juego.guardado.GestorGuardado;
 import juego.vista.sprite.GestorRecursos;
 
 public class PanelMenu extends JPanel {
@@ -31,12 +32,19 @@ public class PanelMenu extends JPanel {
         descripcion.setForeground(new Color(180, 200, 220));
         panelBotones.add(descripcion);
 
-        JButton btnIniciar = new JButton("⚔️  Iniciar Combate");
+        String textoBoton = GestorGuardado.existePartida() ? "Continuar" : "⚔️  Iniciar Partida";
+        JButton btnIniciar = new JButton(textoBoton);
         btnIniciar.setFont(new Font("Monospaced", Font.BOLD, 18));
         btnIniciar.setBackground(new Color(50, 120, 80));
         btnIniciar.setForeground(Color.WHITE);
         btnIniciar.setFocusPainted(false);
-        btnIniciar.addActionListener(e -> controlador.iniciarCombate());
+
+        if (GestorGuardado.existePartida()) {
+            btnIniciar.addActionListener(e -> controlador.continuarPartida());
+        } else {
+            btnIniciar.addActionListener(e -> controlador.iniciarPartida());
+        }
+
         panelBotones.add(btnIniciar);
 
         add(panelBotones, BorderLayout.SOUTH);
